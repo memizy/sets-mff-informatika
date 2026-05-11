@@ -2,7 +2,7 @@
     "$schema": "https://cdn.jsdelivr.net/gh/memizy/oqse-specification@main/schemas/oqse-v0.1.json",
     "version": "0.1",
     "meta": {
-        "id": "019e15e7-8654-7585-83d2-c7343bde6fc6",
+        "id": "019e16ba-61f1-76cd-a8f7-33596278a177",
         "title": "Data Engineering (NDBI046) - Kompletní souhrn",
         "description": "Kompletní studijní sada pro předmět Data Engineering.",
         "author": {
