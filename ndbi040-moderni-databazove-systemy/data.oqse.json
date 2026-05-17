@@ -1,0 +1,513 @@
+{
+  "$schema": "https://cdn.jsdelivr.net/gh/memizy/oqse-specification@main/schemas/oqse-v0.1.json",
+  "version": "0.1",
+  "meta": {
+    "id": "019e36e3-29a7-71d1-a06b-b6057b754b9b",
+    "language": "cs",
+    "title": "Zkouška MDBS - Kompletní souhrn",
+    "description": "Komplexní studijní sada pro přípravu na zkoušku z Moderních databázových systémů (MDBS). Zahrnuje témata od definice Big Data, přes distribuované systémy (HDFS, MapReduce, Spark), NoSQL databáze (Key-value, Document, Column-family, Graph), až po Multi-model, NewSQL a Polystores.",
+    "subject": "Databázové systémy",
+    "createdAt": "2026-05-17T17:01:57.537Z",
+    "updatedAt": "2026-05-17T17:01:57.537Z",
+    "requirements": {
+      "features": [
+        "markdown",
+        "html"
+      ],
+      "metaProperties": [
+        "description",
+        "language",
+        "subject"
+      ]
+    },
+    "customData": {}
+  },
+  "items": [
+    {
+      "id": "019e36e3-29a8-77e5-97d0-63b0df93cbe4",
+      "type": "note",
+      "title": "1. Přednáška - Historie (Úrovně abstrakce)",
+      "content": "**Logic Layer vs. Physical Layer**\n\n* **Logic Layer:** Zde se rozlišují datové struktury pro uložení dat a tedy obecný typ databáze, jako je například relační, grafová nebo XML databáze. Nejedná se o konkrétní databázi, to spadá až do fyzické vrstvy.\n* **Physical Layer:** Na této vrstvě se rozlišuje, jak přesně je databáze naimplementovaná a jaké tam budou indexy."
+    },
+    {
+      "id": "019e36e3-29a8-77e5-97d0-6604f70667b3",
+      "type": "note",
+      "title": "2. Přednáška - Big Data (Vlastnosti \"V\")",
+      "content": "Abychom data mohli klasifikovat jako Big Data, nemusí nutně splňovat všechny tyto vlastnosti:\n\n* **Volume (Objem):** Objem dat se s roky exponenciálně zvyšuje. Nelze je ukládat na jednom stroji, a proto potřebujeme distribuované filesystémy.\n* **Variety (Rozmanitost):** Zahrnuje například videa, příspěvky, komentáře, různé datové typy tabulek či XML. Často se jedná o nestrukturovaná data nebo data s nestálou strukturou.\n* **Velocity (Rychlost):** Data velmi rychle přibývají.\n* **Veracity (Nejistota):** Data se mohou na cestě ztratit, mohou být nekompletní nebo zaokrouhlená.\n* **Value (Hodnota):** Data mají obrovskou hodnotu pro byznys.\n* **Validity (Platnost):** Data mají omezenou platnost, po nějaké době již nejsou relevantní."
+    },
+    {
+      "id": "019e36e5-c184-717c-8f9b-2b083b2a91ea",
+      "type": "note",
+      "title": "2. Přednáška - Zkratky a škálování",
+      "content": "### Přístupy ke zpracování dat\n* **OLTP (Online Transaction Processing):** Klasické databázové aplikace (DBMSs). Slouží pro ukládání, změny a dotazy, přičemž k datům přistupuje více uživatelů najednou.\n* **OLAP (Online Analytical Processing):** Data Warehousing. Cílem je data analyzovat (ne úplně real-time). Data se moc nemění a dělají se nad nimi složité analytické dotazy.\n* **RTAP (Real-Time Analytic Processing):** Big Data architektura. Zpracovává proud dat v reálném čase. Nová data jsou ihned k dispozici, umíme je spojovat s historickými a rychle z nich získávat informace.\n\n### Způsoby škálování\n* **Scale-up (Vertical scaling):** Zvýšení výkonu zakoupením lepšího stroje.\n* **Scale-out (Horizontal scaling):** Přidání více strojů. Je to ekonomicky výhodnější (např. jako startup nemusím hned kupovat drahý stroj), ale přináší to problémy jako výpadky uzlů nebo rychlost sítě."
+    },
+    {
+      "id": "019e36e5-c184-717c-8f9b-2c75b16e4508",
+      "type": "note",
+      "title": "2. Přednáška - Specifika NoSQL světa",
+      "content": "Ve světě NoSQL databází se z povahy dat obecně velmi málo **updatuje**. Tato operace nebývá příliš efektivní, takže se data často prostě zapíšou znovu a stará se zahodí.\n\n* **Zápis a čtení:** Platí pravidlo, že data jednou zapíšu a pak se na ně už jen dotazuji a neměním je.\n* **Replikace:** Dat je obrovské množství a jsou distribuovaná. Místo občasného zálohování (backupu) se dělá replikace, protože potřebujeme rychle distribuovat a nahrazovat výpadky.\n* **Integrita dat:** Neplatí vždy absolutně a okamžitě; spíše k ní dojde eventuálně během propagace (eventual consistency).\n* **Materialized Views:** Předpočítané pohledy pro dotazy, které nejsou v souladu se strukturou uložení. Jelikož se data moc nemění, toto řešení dává smysl.\n* **Schemalessness:** Není nutné definovat striktní schéma předem, ale možnost tu je."
+    },
+    {
+      "id": "019e36e5-c184-717c-8f9b-302ec869ce5c",
+      "type": "note",
+      "title": "2. Přednáška - Agregáty (Aggregates)",
+      "content": "**Agregát** je logická datová jednotka s komplexní strukturou, která spolu souvisí (např. celý dokument nebo key-value pár).\n\n* **Konzistence a redundance:** Měníme celou jednotku najednou, je to tedy i jednotka konzistence. Může obsahovat i určitou míru redundance (např. jméno zákazníka u každé jeho objednávky).\n* **Aggregate-ignorant vs. Aggregate-oriented:**\n  * *RDBMS a grafové databáze* jsou tzv. *aggregate-ignorant*, protože data rozsekávají a normalizují.\n  * *NoSQL databáze* jsou *aggregate-oriented*.\n* **Dotazování:** Agregační přístup umožňuje snazší dotazování bez nutnosti používat nákladné JOINy, **pokud** se dotazujeme v souladu s touto strukturou. V opačném případě je to problém a dotaz potrvá dlouho."
+    },
+    {
+      "id": "019e36e7-9ff9-7656-a7c2-d962d40f0572",
+      "type": "note",
+      "title": "3. Přednáška - Základy HDFS a Hadoop",
+      "content": "**HDFS (Hadoop Distributed File System)** je distribuovaný souborový systém připravený pro běh na velkém množství obyčejných PC. Systém počítá s výpadky uzlů a umí je sám spravovat.\n\n* **Zpracování dat:** Data jsou přijímána ze streamu a zpracovávána po částech. Systém nepočítá s interaktivním přístupem, jako je například přepisování jedné konkrétní kolonky ve všech dokumentech.\n* **Write-once read many (WORM):** Data se jednou uloží a následně se z nich dělají statistiky nebo se zpracovávají; mění se jen velmi málo.\n* **Hadoop MapReduce:** Slouží pro paralelní zpracování velkých datasetů. Typické využití Hadoopu a MapReduce zahrnuje tvorbu statistik či běh web-crawlerů."
+    },
+    {
+      "id": "019e36e7-9ff9-7656-a7c2-dca01692d169",
+      "type": "note",
+      "title": "3. Přednáška - Architektura HDFS (NameNode a DataNode)",
+      "content": "Architektura HDFS se dělí na Master a Slave uzly:\n\n* **NameNode (Master):** Spravuje celý souborový systém (namespace), včetně názvů souborů a přístupových práv. Udržuje si přehled o tom, kde přesně jsou data uložena. O spravování replikace se stará také NameNode.\n* **DataNodes (Slave):** Provádějí samotné čtení a zápis dat. Na základě instrukcí od NameNode zajišťují replikaci bloků.\n* **Bloky a Replikace:** Soubory jsou rozděleny do bloků (typicky o velikosti 64 MB nebo 128 MB). Velikost bloku lze pro každý soubor nakonfigurovat zvlášť; všechny bloky souboru jsou pak stejně velké až na ten poslední. Pro soubory lze nastavit i replikační faktor.\n* **Komunikace:** DataNode pravidelně posílá NameNode tzv. **HeartBeat** (informuje, že uzel žije) a občasně **BlockReport** (seznam bloků, které uzel aktuálně má)."
+    },
+    {
+      "id": "019e36e7-9ff9-7656-a7c2-e0e413094859",
+      "type": "note",
+      "title": "3. Přednáška - Replica Placement (Rozmístění replik)",
+      "content": "Uzly (Nody) jsou v clusteru rozděleny do tzv. **racků** (množina uzlů propojená rychlým síťovým spojením). Systém využívá **Rack-aware replica placement**, což znamená, že repliky umísťuje s ohledem na fyzickou topologii sítě.\n\n* **Každá replika na jiném racku:** Umožňuje číst data z více racků najednou a v případě výpadku celého racku o data nepřijdeme. Nevýhodou je, že zápisy jsou dražší, protože se data musí posílat po síti na všechny racky.\n* **Nejčastější strategie (při 3 replikách):** Jedna replika se umístí na stejný rack (jako primární blok) a druhá replika se umístí na úplně jiný rack."
+    },
+    {
+      "id": "019e36ec-9d9d-732b-bda1-653343ae67e4",
+      "type": "note",
+      "title": "3. Přednáška - Funkčnost NameNode",
+      "content": "NameNode využívá pro svůj běh dva hlavní mechanismy:\n\n* **EditLog:** Transakční log, kterým zaznamenává libovolnou proběhlou změnu.\n* **FsImage:** Obsahuje celý souborový namespace, mapování bloků na soubory a data filesystému. Spolu s logem je uložen lokálně na disku NameNodu a je vždy načtený v jeho paměti (je poměrně kompaktní, stačí mu 4GB RAM).\n\n**Start systému a Checkpointy:**\n* Když se filesystém nastartuje, načte se FsImage a EditLog a následně se změny z EditLogu aplikují na FsImage.\n* Tato nová verze FsImage se zapíše na disk, čímž se vytvoří **checkpoint** a EditLog se \"usekne\" (pročistí).\n* Checkpointy se vytvářejí periodicky a slouží k tomu, abychom z nich mohli při případném pádu systému načíst poslední stav."
+    },
+    {
+      "id": "019e36ec-9d9d-732b-bda1-6b34adccf1e5",
+      "type": "note",
+      "title": "3. Přednáška - Funkčnost DataNode",
+      "content": "DataNode má v architektuře velmi specifickou, ale klíčovou roli:\n\n* O samotný filesystém se nestará a ani o něm neví; pouze jednoduše ukládá bloky do souborů.\n* Nedává všechny soubory do jednoho adresáře (protože to operační systémy často nepodporují), ale pomocí heuristik se sám rozhodne, kolik jich tam umístí.\n* **BlockReport:** Když se filesystém nastartuje, DataNode udělá BlockReport. V něm pošle NameNodu zprávu o tom, jaké uložené bloky si myslí, že má.\n* **Komunikace s klientem:** Klient (client) zapisuje data přímo na DataNodes. Nemusí tedy jít úplně všechno přes NameNode."
+    },
+    {
+      "id": "019e36ec-9d9d-732b-bda1-6c15a2f0b4bd",
+      "type": "note",
+      "title": "3. Přednáška - Failures (Výpadky) a API",
+      "content": "HDFS je robustní a dokáže se vypořádat s různými problémy:\n\n* **Rozbitý NameNode:** Je potřeba načíst data z posledního checkpointu a NameNode obnovit, případně vzít nový.\n* **Rozbitý DataNode:** Vytvoří se nové repliky souborů, které tento uzel měl, abychom se dostali zpět na požadovaný replikační faktor.\n* **Výpadek sítě:** Když přestanou chodit HeartBeaty, NameNode označí dané DataNodes za nedosažitelné a neposílá jim požadavky. Následně se vytvoří nové repliky (pokud se uzly později znovu připojí, můžeme mít chvíli i více replik, než bylo původně v plánu).\n\n**API a Rozhraní:**\n* K dispozici je FS shell, který se ovládá jako na normálním systému (např. `/bin/hadoop fs -mkdir /foodir`).\n* Systém má také rozhraní pro Javu, Python nebo HTTP browser určené pro procházení file systému."
+    },
+    {
+      "id": "019e36ed-cde9-70de-8ff1-8227dd9115a3",
+      "type": "note",
+      "title": "4. Přednáška - Úvod do MapReduce a Paralelní modely",
+      "content": "**MapReduce** je framework a programovací model založený na principu \"rozděl a panuj\" (divide and conquer) pro paralelní zpracování, programovaný primárně v Javě.\n\n### Modely paralelního programování:\n* **Message passing:** Každý proces/uzel má svůj kousek dat a vzájemně komunikují pomocí posílání zpráv.\n* **Shared memory:** Existuje jedno společné úložiště, kam všichni asynchronně zapisují a ze kterého čtou.\n* **Data parallelization:** Data jsou rozdělena pro jednotlivé tasky (úlohy), které následně běží nezávisle na sobě (princip rozděl a panuj)."
+    },
+    {
+      "id": "019e36ed-cde9-70de-8ff1-84cf8ca5c726",
+      "type": "note",
+      "title": "4. Přednáška - Funkce Map a Reduce",
+      "content": "Jádro frameworku MapReduce tvoří dvě hlavní funkce a proces zvaný shuffling:\n\n* **Map (Rozdělení problému):** Rozdělí hlavní problém na podproblémy. Funkce dostane na vstupu klíč a hodnotu a vrátí množinu dvojic nového klíče a hodnoty: `(k1, v1) -> list(k2, v2)`. *Příklad:* Dostane id souboru a jeho obsah a vyhodí jednotlivé slovo a číslo 1.\n* **Reduce (Vyřešení podproblémů):** Vyřeší podproblémy se stejným klíčem. Transformuje vstupní data do (potenciálně menšího) výstupu: `(k2, list(v2)) -> (k2, possibly smaller list(v2))`. *Příklad:* Vezme všechny dvojice se stejným slovem a sečte jejich jedničky.\n* **Shuffling:** Systém se sám stará o zbytek operací, především o \"shuffling\", což je přiřazení stejných klíčů k sobě před fází Reduce."
+    },
+    {
+      "id": "019e36ed-cde9-70de-8ff1-8980488219d2",
+      "type": "note",
+      "title": "4. Přednáška - Příklady použití a kritika",
+      "content": "### Časté příklady použití MapReduce:\n* **Distribuovaný grep:** Map vyhodí `(slovo, soubor a číslo řádku)`, Reduce funguje jako identita.\n* **Reverse web-link graph:** Map zjistí odkazy a vyhodí `(target URL za každej link, url stránky)`. Reduce pak spojí zdrojové URL do listu a zjistí, kdo všechno na cílovou stránku ukazuje.\n* **Inverted index:** Zjišťuje, v jakých dokumentech se vyskytuje dané slovo (podobné jako s URL).\n* **Distribuovaný sort:** Třídění podle klíče (díky fázi shuffling to framework udělá skoro sám).\n* **Nejčastější slova v souboru:** Reduce prostě ustřihne ta slova, která nejsou v Top X.\n\n### Historický kontext a kritika:\n* MapReduce není lékem na všechno. Michael Stonebraker ho kritizoval za to, že nemá databázové vlastnosti a spoléhá na hrubou sílu.\n* Facebook technologii hojně využíval v roce 2010.\n* Google postupně přešel na **Google Cloud DataFlow** (stream data processing), aby nemusel udržovat tak složitou infrastrukturu."
+    },
+    {
+      "id": "019e36f4-154c-7288-b7ba-890be7518ea6",
+      "type": "note",
+      "title": "4. Přednáška - Architektura MapReduce a Map Fáze",
+      "content": "Proces zpracování v MapReduce se skládá z několika částí, přičemž většinu z nich lze přeprogramovat:\n\n* **Task vs. Function:** Task (úloha) se spouští na jednom uzlu (Node) a postupně spouští jednotlivé Functions (funkce). Počet `MapTasks (M)` a `ReduceTasks (R)` si můžeme specifikovat.\n* **Master:** Přiděluje Workerům jednotlivé tasky (MapTask nebo ReduceTask).\n* **InputReader:** Čte data z disku či HDFS a rozdělí vstup na tzv. splits o správné velikosti (doporučeno 16-64 MB) a vytvoří dvojice klíč-hodnota. \n* **MapWorker:** Načte data z InputReaderu, spustí uživatelem dodanou **Map function** a výsledky si bufferuje do paměti. Jeden uzel může postupně dostat i více částí ke zpracování."
+    },
+    {
+      "id": "019e36f4-154c-7288-b7ba-8d3115a09250",
+      "type": "note",
+      "title": "4. Přednáška - Partitioning a Shuffle",
+      "content": "Předtím, než se data dostanou do finální fáze Reduce, musí se správně roztřídit a připravit:\n\n* **Partition function:** Určuje, jak se výstupy map rozdělí pro reduce na jednotlivých uzlech podle klíče, aby stejné klíče připadly vždy na jeden stejný ReduceTask.\n* **Výpočet hashe:** Obvykle se udělá hash klíče děleno `R` (počet ReduceTasků). Díky tomu je na každém MapWorkeru vlastně uložen kus ReduceTasku.\n* **Uložení a Master:** Výsledky zapíše MapWorker na lokální disk a informace o místě jejich uložení předá Masteru.\n* **Compare function (Shuffle):** Definuje, jakým způsobem se mají data setřídit a sloučit dohromady."
+    },
+    {
+      "id": "019e36f4-154c-7288-b7ba-901dda7ab940",
+      "type": "note",
+      "title": "4. Přednáška - Reduce Fáze, Output a Funkce Combine",
+      "content": "Závěrečná část zpracování, kde se kompletují výsledky a zapisují na úložiště:\n\n* **ReduceWorker:** Master spustí ReduceTask na ReduceWorkeru a řekne mu, odkud má číst. Worker pak pomocí RPC (remote procedure calls) získá data, která setřídí podle klíčů (při velkém objemu dat se použije externí sort).\n* **Reduce function a Output writer:** Stejné klíče se předají uživatelem dodané Reduce funkci. Výsledek (jeden pro každý ReduceTask) se přidá do výstupního souboru, který Output writer zapíše na disk nebo do HDFS.\n\n### **Vylepšení: Funkce Combine**\nPo dokončení Map fáze lze spustit tzv. **Combine funkci**, která udělá lokální Reduce jen pro danou část. Hodí se to například při počítání frekvence slov – data se lokálně \"zkomprimují\" a po síti k ReduceWorkeru se pak nemusí posílat tak velký soubor."
+    },
+    {
+      "id": "019e36f5-a760-7543-b735-f4606d4adc17",
+      "type": "note",
+      "title": "4. Přednáška - Monitoring a řešení výpadků",
+      "content": "K udržení přehledu a odolnosti vůči chybám používá MapReduce několik mechanismů:\n\n* **Counters (Čítače):** Lze je přiřadit libovolné akci (např. evidují počet zpracovaných vstupních a výstupních párů). Slouží ke sledování pokroku a zjištění, kolik práce je už hotovo.\n* **Výpadky Workerů:** Master pravidelně pinguje Workery. Pokud nějaký neodpovídá, všechny tasky pro něj určené se vrátí do stavu **idle** (nečinný) a Master je přidělí dalším Workerům, jakmile mají volno.\n* **Výpadek Mastera:** Stává se to málo (je jen jeden), ale při jeho pádu se buď celý MapReduce restartuje, nebo se načte stav z dříve vytvořených checkpointů.\n* **Stragglers (Opozdilci):** Některý task může trvat velmi dlouho (např. kvůli chybě Workeru). Když se MapReduce blíží ke konci, Master spustí tyto zbylé pomalé tasky na více Workerech najednou. Jakmile ho kdokoliv dodělá jako první, task je hotov."
+    },
+    {
+      "id": "019e36f5-a761-729f-a542-0f04bb60c24b",
+      "type": "note",
+      "title": "4. Přednáška - Nastavení a složitost (MapReduce)",
+      "content": "Pro efektivní chod systému je důležité správné nastavení a pochopení zátěže Mastera:\n\n* **Parametry M a R:** \n  * Počet map tasků (**M**) by měl být nastaven tak, aby jedna část vstupu měla 16-64 MB (dle doporučení z r. 2009). \n  * Počet reduce tasků (**R**) má být malý násobek počtu ReduceWorkerů. \n  * Oba parametry (M i R) by měly být o dost vyšší, než je celkový počet workerů v clusteru.\n* **Zátěž Mastera:**\n  * Master provede O(M + R) plánovacích rozhodnutí (scheduling decisions).\n  * V paměti ukládá O(M * R) informací o stavu.\n  * Pro každý task si pamatuje jeho stav (idle, in-progress, completed) a místo, kde aktuálně běží.\n  * U hotových map tasků uchovává místa a velikosti R regionů určených pro Reducery."
+    },
+    {
+      "id": "019e36f5-a761-729f-a542-13a738e4d9e2",
+      "type": "note",
+      "title": "4. Přednáška - Architektura Hadoop MapReduce",
+      "content": "Hadoop implementuje MapReduce pomocí specifických komponent, které úzce spolupracují s HDFS:\n\n* **Hlavní komponenty:** Skládá se z HDFS, **JobTrackeru** (zastává roli Mastera) a **TaskTrackerů** (běží na každém DataNodu, který je Slavem pro MapReduce).\n* **JobTracker (Master):** Komunikuje přímo s NameNode a vyhledává DataNody s připravenými TaskTrackery, které jsou fyzicky co nejblíže požadovaným datům (data locality).\n* **TaskTracker (Slave):** Každý uzel má sloty pro několik tasků a spouští separátní JVM (Java Virtual Machine) pro každý jednotlivý task. Počet svých volných slotů pravidelně předává JobTrackeru pomocí heartbeatů.\n* **Životní cyklus:** Uživatel (klient) vytvoří Job s konfigurací, předá ho clusteru a následně jen čeká na dokončení výpočtu."
+    },
+    {
+      "id": "019e36f7-6fc6-779b-850d-60332a5d2bb4",
+      "type": "note",
+      "title": "5. Přednáška - Úvod do Apache Spark",
+      "content": "**Apache Spark** je analytický engine (analytics engine), který běží na clusteru uzlů (nodů).\n\n* **Zpracování dat:** Umožňuje vytvářet grafy postupného zpracování dat. Koncept je podobný jako u MapReduce, ale s tím rozdílem, že jednotlivé fáze zpracování můžeme libovolně větvit, skládat a můžeme jich mít, kolik jen chceme.\n* **Další funkcionalita:** Podporuje **SparkSQL** (což není úplně plnohodnotné SQL, ale využívá se proto, že ho lidé dobře znají). Dále systém umí pracovat s machine learningem a tzv. graph processingem."
+    },
+    {
+      "id": "019e36f7-6fc6-779b-850d-666384b4190b",
+      "type": "note",
+      "title": "5. Přednáška - Architektura a části Sparku",
+      "content": "Základní komponenty architektury Apache Spark:\n\n* **Driver Program (Řídící jednotka):** Přijímá požadavky pro spuštění a spouští paralelní operace na clusteru. Měl by běžet co nejblíže k worker nodům, ideálně na stejné lokální síti. Má k dispozici i webové rozhraní.\n* **SparkContext:** Nachází se uvnitř Driver Programu. Koordinuje komunikaci s Cluster Managerem a posílá mu operace k provedení. Jakmile se SparkContext připojí, dostane na clusteru přidělené **Executory**, kterým následně posílá Tasky (kód), jež na nich mají běžet.\n* **Cluster Manager:** Stará se o prostředky. Spark podporuje různé typy: Standalone (jednoduchý cluster manager přímo od Sparku), Apache Mesos, Hadoop YARN (resource manager v Hadoop 2) nebo Kubernetes."
+    },
+    {
+      "id": "019e36f7-6fc6-779b-850d-693c72759966",
+      "type": "note",
+      "title": "5. Přednáška - Spark aplikace a Inicializace",
+      "content": "### Běh aplikací a Executory\n* Každá Spark aplikace disponuje vlastními executor procesy, které spouští přidělené tasky ve více vláknech.\n* Jednotlivé Spark aplikace (instance SparkContextu) jsou od sebe přísně izolované. Z toho vyplývá, že si mezi sebou nemohou předávat data jinak, než jejich zapsáním na sdílené externí úložiště.\n\n### Inicializace Sparku\n* Nejdříve je nutné sestavit konfiguraci `SparkConf`, které předáme jméno aplikace a tzv. `master` (což určuje typ použitého cluster manageru).\n* Tuto konfiguraci následně předáme `SparkContextu`, díky čemuž bude přesně vědět, jakým způsobem se má ke clusteru připojit."
+    },
+    {
+      "id": "019e36f9-0130-7487-b238-b616c9665ae8",
+      "type": "note",
+      "title": "5. Přednáška - RDD (Resilient Distributed Dataset)",
+      "content": "**RDD** je immutable (neměnná) datová množina, která je rozdělená napříč clusterem.\n\n* **Vlastnosti:** Můžeme ji paralelně zpracovávat, můžeme dát její část do paměti a cluster zajišťuje zotavení ze selhání.\n* **Způsoby vytvoření RDD:**\n  * **Referencí:** Vytvoření odkazem na dataset například v HDFS, Cassandra nebo HBase (má velkou kompatibilitu s Hadoopem, na kterém jsou tyto systémy vystavěny).\n  * **Paralelizací:** Z existující kolekce dat v driver programu. Na instanci SparkContextu zavoláme funkci `parallelize`, které dáme například `list`, a ona nám vrátí RDD nad daným typem.\n  * **Načtením ze souboru:** Můžeme zavolat `sc.textFile` a ten nám dá zase RDD jako kolekci řádků."
+    },
+    {
+      "id": "019e36f9-0130-7487-b238-bb8e0637e001",
+      "type": "note",
+      "title": "5. Přednáška - RDD Operace (Transformace a Akce)",
+      "content": "Operace nad RDD rozdělujeme do dvou základních skupin:\n\n* **Transformace:** **Lazily** (líně) vytvoří z jedné RDD jinou RDD. Předá každý element datasetu do funkce a vezme výsledky (podobně jako `map`). Načtení souboru reálně nic nedělá (je to jen pointer), akce se provede, až když je to skutečně potřeba (ani transformace nic nedělá, čeká se až na akci). RDD můžeme transformovat vícekrát, čímž tvoříme graf.\n* **Akce (Actions):** Vrací hodnotu driver programu pro daný dataset (něco jako `reduce`).\n* **Příklad:** Pro načtení textfilu použijeme `map` vracející délku řádku a pak sčítání. Každá machine, která to dostane přidělené, provede `map`, následně i lokální redukci a vrátí výsledek.\n* **Ukládání:** Můžeme si uložit RDD v paměti pomocí `persist` a pak jej dostaneme příště rychle, až bude potřeba. RDD můžeme ukládat i na disk i distribuovaně."
+    },
+    {
+      "id": "019e36f9-0130-7487-b238-bc835b9bc75d",
+      "type": "note",
+      "title": "5. Přednáška - Transformace (Přehled)",
+      "content": "Zde jsou základní příklady transformací, které aplikujeme na RDD:\n\n* **`map(func)`:** Na každý element aplikuje zadanou funkci.\n* **`union(otherDataset)`:** Spojí dva datasety. Můžeme využít i intersection (průnik) či rozdíl.\n* **`filter(func)`:** Vybere elementy, kde funkce vrací `true`.\n* **`reduceByKey(func)`:** Vrací `(K, V)` páry zredukované podle klíče pomocí funkce typu `(V,V) => V`. Můžeme mu říct, na kolik reduce tasků se to má rozdělit; hodnoty pro key jsou složené do jednoho tuplu.\n* **`sortByKey(ASC/DESC)`:** Seřadí páry podle klíče (tyto klíče ovšem musí být seřaditelné). Také mu lze říct, na kolik tasků to má rozdělit."
+    },
+    {
+      "id": "019e36fa-cd34-7557-8d80-45ce366eae37",
+      "type": "note",
+      "title": "5. Přednáška - RDD Akce a Shuffle",
+      "content": "### Akce (Actions)\n* **`reduce(func)`:** Funkce by měla být komutativní a asociativní, abychom to mohli provést paralelně a dostat jeden výsledek.\n* **Další akce:** `count()`, `first()`, `take(n)` (vrátí prvních n prvků), `takeOrdered(n, ordering)` (nejdřív data seřadí, pak vezme prvních několik).\n\n### **Shuffle**\n* Některé operace vyžadují tzv. shuffle – data se musí překopírovat mezi uzly, aby byla fyzicky u sebe. Tato operace je velmi drahá.\n* **Příklad:** Operace `reduceByKey` vyžaduje shuffle, protože všechny stejné klíče se musí dát k sobě, aby se mohly sjednotit."
+    },
+    {
+      "id": "019e36fa-cd34-7557-8d80-4beca9e1b6e6",
+      "type": "note",
+      "title": "5. Přednáška - Closures a sdílení dat",
+      "content": "**Closures** jsou proměnné a metody viditelné pro exekutor, které potřebuje pro výpočet. Když dostane exekutor task na RDD, dostane i serializovaný closure (posíláme tedy kopie). Změny se mezi jednotlivými executory nepromítají.\n\nPro sdílení dat máme dvě hlavní možnosti:\n* **Broadcast Variable:** Je to **readonly** (pouze pro čtení) proměnná, která se nacachuje na každé machine a pak se už nemusí posílat pro každý task znova. Vytvoříme ji pomocí `SparkContextInstance.broadcast(v)` a přistupujeme na ni přes `boradcastVar.value()`.\n* **Akumulátor:** Tasky na clusteru do něj mohou zapisovat (je v podstatě globální), ale číst ho může jen driver program pomocí `.value`. Je potřeba, aby operace přidání byla komutativní a asociativní."
+    },
+    {
+      "id": "019e36fe-e438-7257-9909-1ffbb971b51a",
+      "type": "note",
+      "title": "5. Přednáška - DataFrame a Dataset",
+      "content": "### Koncepty DataFrame a Dataset\n* **Dataframe:** Data jsou organizována do pojmenovaných sloupců. Můžeme pak dávat modulu SparkSQL (modul Sparku pro processing strukturovaných dat) dodatečné informace pro optimalizace.\n* **Dataset:** Může být jako Dataframe slabě typován – `Dataset<Row>`, což jsou obecné řádky s pojmenovanými sloupci. A nebo může být silně typován – `Dataset<T>`, kde přímo definujeme třídu `T`.\n\n### Práce s daty a SQL pohledy\n* Když načtu například JSON a pak to vyprintnu, Spark umí zjistit jména sloupců podle properties v JSONu; můžu si i vypsat schéma.\n* Lze provádět manipulace, například do sloupce přičíst ke každé hodnotě 1.\n* Netypovaný DataSet můžu zaregistrovat jako SQL pohled, což mi jakoby vytvoří tabulku (např. people). Pohledy máme:\n  * **Temporary:** Tyto jsou session scoped (platí pro danou relaci).\n  * **Global:** Existuje, dokud běží Sparková aplikace a patří k databázi `global_temp`.\n\n### Typované Datasety a Encodery\n* Pro typované datasety použijeme **encoder**, který nám serializuje objekt do SparkSQL reprezentace. Ten umí filtrovat, sortovat a hashovat bez nutnosti deserializace.\n* V praxi pak dáme na konec čtení dat `.as(someEncoder)` a dostaneme typovaný Dataset.\n\n### Konverze RDD na Datasety\n* Můžeme konvertovat RDD na datasety pomocí **reflexe**, a nebo, když ho neznám, tak ho můžeme zkonstruovat na základě vstupu.\n* **Příklad pomocí objektu:** `textFile(neco).javaRDD().map(line -> namapování na Person třeba kterej zde vytvoříme a pak return person)`.\n* **Příklad neznámého schématu:** Když schéma nevíme, můžeme vrátit `RowFactory.create(hodnota1, hodnota2 ...)` a k tomu přidat `schema_string` s popisy sloupců (např. `\"name age\"`). Pak z toho můžu dostat untyped Dataset."
+    },
+    {
+      "id": "019e3700-b127-734d-8ba2-98c7d5434dfa",
+      "type": "note",
+      "title": "6. Přednáška - Přehled NoSQL",
+      "content": "NoSQL databáze pracují s objekty distribuovanými na více serverech. \n\n* **Výkon vs. ACID:** V těchto systémech nebudeme mít k dispozici všechny tradiční ACID vlastnosti, ale získáme tím podstatně lepší výkon (performance).\n* **Zápis (Write):** Systém typicky zapisuje na všechny repliky.\n* **Čtení (Read):** Načte se jen 1 replika, což znamená, že v ní nemusí být nutně obsažena ta nejnovější data.\n* **Konzistence:** Místo silné konzistence se v NoSQL světě často využívá tzv. **eventuální konzistence**."
+    },
+    {
+      "id": "019e3700-b127-734d-8ba2-9eaec5b8b4ce",
+      "type": "note",
+      "title": "6. Přednáška - Škálování a ACID vlastnosti",
+      "content": "### Přístupy ke škálování\n* **Vertikální škálování (Scale-up):** Tradiční cesta, jak dosáhnout silné konzistence. Vzniká zde ovšem problém *vendor-lock in* (závislost na drahých a specializovaných strojích, které dělá jen málo výrobců) a výkon nelze navyšovat donekonečna (např. startup dopředu neví, jak bude úspěšný).\n* **Horizontální škálování (Scale-out):** Umožňuje snadnější růst přidáváním dalších strojů, ale přináší naopak problémy se sítí.\n\n### Tradiční ACID vlastnosti\n* **Atomicity:** Vše, nebo nic v rámci transakce.\n* **Consistency:** Stav databáze je vždy korektní.\n* **Isolation:** Nedodělaná (nekomitnutá) transakce není vidět pro ostatní uživatele.\n* **Durability:** Schopnost zotavení z chyb (recovery) a trvalé uložení dat."
+    },
+    {
+      "id": "019e3700-b127-734d-8ba2-a26f3c2b27ab",
+      "type": "note",
+      "title": "6. Přednáška - CAP Teorém",
+      "content": "CAP teorém definuje tři základní vlastnosti distribuovaných systémů, přičemž platí pravidlo, že **nelze mít všechny 3 současně**:\n\n* **Consistency (Konzistence):** Po updatu dat všichni čtou stejná data (všechny uzly mají vždy stejná data). V distribuovaném systému to znamená nutnost zapsat úspěšně na všechny repliky.\n* **Availability (Dostupnost):** Všechny požadavky jsou vždy odpovězeny, a to i v případě, že dojde k chybě.\n* **Partition tolerance (Odolnost vůči rozdělení sítě):** Systém nadále operuje, i když se rozpadne síťové spojení a část clusteru tím odpadne.\n\n### Shrnutí kompromisů\nTradiční ACID databáze mívají hlavně **Consistency** a **Availability**. V distribuované síti však nutně potřebujeme **Partition Tolerance**, a proto distribuované databáze mohou trochu ošidit konzistenci a spoléhat se pouze na *eventuální konzistenci*."
+    },
+    {
+      "id": "019e3702-0411-76a2-8db6-89d838ef5223",
+      "type": "note",
+      "title": "6. Přednáška - Princip BASE",
+      "content": "Pro distribuované systémy platí trochu jiné podmínky než tradiční ACID, a proto se využívá koncept **BASE**:\n\n* **Basically Available (Základní dostupnost):** Část systému může selhat, ale celkově systém dál pracuje a odpovídá na požadavky.\n* **Soft state (Měkký stav):** Systém je fluidní a nedeterministický, neustále se v něm dějí změny.\n* **Eventual Consistency (Eventuální konzistence):** Stav systému bude plně konzistentní až někdy v budoucnu. V praxi to znamená, že i ten uživatel, který data právě zapsal, se může následně zeptat jiného uzlu (node) a dostat zpět starou hodnotu, než se změna plně zpropaguje."
+    },
+    {
+      "id": "019e3702-0412-725e-a319-1de5b95d89d1",
+      "type": "note",
+      "title": "6. Přednáška - Replikace a Sharding",
+      "content": "Aby distribuovaný systém správně fungoval, využívá dvě základní techniky pro správu dat:\n\n* **Replikace (Replication):** Data potřebujeme zreplikovat (vytvořit jejich kopie), abychom je mohli stále vracet uživatelům i v případě, že vypadne část clusteru.\n* **Sharding:** Určuje, jakým způsobem jsou různá data rozdělená na různé uzly (nody) v systému."
+    },
+    {
+      "id": "019e3702-0412-725e-a319-2365b2926bf6",
+      "type": "note",
+      "title": "6. Přednáška - Distribuční modely",
+      "content": "Podle architektury můžeme rozlišit následující distribuční modely:\n\n* **Jeden server:** Typické pro klasické relační databáze nebo grafové databáze. Tyto databáze se jinak těžko distribuují, obzvláště když má graf velké množství hran.\n* **Více serverů (Sharding):** Data, která potřebujeme zpracovávat dohromady, se snažíme dát fyzicky blízko k sobě.\n  * *Příklad:* Uživatele či firmy rozdělíme podle lokace (např. Evropa, USA), kde máme umístěné servery, díky čemuž budou mít i menší odezvu.\n* **Auto-sharding:** Často samotné databázové systémy nabízejí nějakou formu automatického shardingu, aby vývojářům usnadnily práci."
+    },
+    {
+      "id": "019e3704-116f-72ae-95b1-fac424eb675d",
+      "type": "note",
+      "title": "6. Přednáška - Master-slave replikace",
+      "content": "V tomto replikačním modelu je jeden uzel (node) master a ten celou operaci řídí.\n\n* **Zápis a čtení:** Na mastera chodí všechny updaty na data, která spravuje, a on následně propaguje tyto změny do svých slavů. Čtení (read) ovšem může být děláno odkudkoliv.\n* **Využití:** Tento přístup je velmi dobrý na tzv. read-intensive data (tam, kde není příliš mnoho zápisů a spíše se čte).\n* **Role a výpadky:** Slave funguje primárně jako replika mastera. Když master vypadne, můžeme velmi rychle změnit některého ze slavů na nového mastera.\n* **Rozložení rolí:** Masterů je v systému víc, ale pro jedny konkrétní data je master vždy jen jeden. Klidně tak může být jeden uzel masterem pro nějaká data a zároveň slavem pro úplně jiná data."
+    },
+    {
+      "id": "019e3704-1170-74dc-a7a1-e145f780554e",
+      "type": "note",
+      "title": "6. Přednáška - Peer-to-peer replikace",
+      "content": "V Peer-to-peer modelu je architektura více decentralizovaná a rovnocenná:\n\n* **Zápis a čtení:** Kdokoliv (kterýkoliv uzel) umí zapisovat i poskytovat čtení. Změny si pak uzly navzájem propagují mezi sebou.\n* **Problémy s konzistencí:** Z tohoto přístupu plynou určité consistency problémy. Například může nastat problém při zápisu stejné věci na dvou různých místech současně, takže se repliky musí koordinovat.\n* **Řešení koordinace:** Aby se systém dohodl, stačí, když souhlasí většina replik (nemusí to být nutně všechny).\n* **Využití:** Tato replikace je často používaná pro column-family databáze. Replikační faktor 3 je zde velmi dobrý pro proces hlasování."
+    },
+    {
+      "id": "019e3704-1170-74dc-a7a1-e67794f84103",
+      "type": "note",
+      "title": "6. Přednáška - Write-write conflict",
+      "content": "Při distribuovaném zápisu může nastat tzv. **Write-write conflict**:\n\n* **Lost update:** Může dojít k problému \"ztraceného updatu\", kdy nám někdo přepíše ještě \"necommitnutou\" informaci, kterou systém potřebuje dál.\n* **Způsoby řešení:** Pro řešení konfliktů máme optimistické a pesimistické přístupy:\n  * **Pesimistické:** Využívají se například tzv. *write locks* (zámky pro zápis).\n  * **Optimistické:** Dělá se například podmíněný update podle timestampu (nesmí být moc nedávný). Případně se prostě uloží obě verze dat současně a k nim se zapíše informace, že jsou aktuálně v konfliktu."
+    },
+    {
+      "id": "019e3704-7af3-72dc-a354-6b52c1e05d38",
+      "type": "note",
+      "title": "6. Přednáška - Read-write conflict",
+      "content": "Při souběžném přístupu k datům může dojít k tzv. **Read-write konfliktu**:\n\n* **Princip problému:** Jedna transakce si přečte hodnotu, druhá jí tu hodnotu přepíše a druhé čtení nám pak dá úplně jinou hodnotu.\n* **Atomické updaty:** NoSQL databáze často podporují atomické updaty pouze pro jeden konkrétní agregát (např. jeden JSON dokument).\n* **Inconsistency window:** Když se snažíme měnit více agregátů najednou, vzniká tzv. *inconsistency window* (okno nekonzistence), během kterého mohou tyto problémy nastat.\n* **Replication consistency:** Souvisí s tím i fakt, že stejná data na různých replikách mohou mít v daný okamžik jiné hodnoty, pokud se změna ještě nevypropagovala napříč clusterem."
+    },
+    {
+      "id": "019e3704-7af3-72dc-a354-6c284a262d07",
+      "type": "note",
+      "title": "6. Přednáška - Quorums (Kvóra)",
+      "content": "Koncept **Quorums** určuje, kolik uzlů (nodů) je potřeba do operace zapojit, abychom v systému dosáhli silné konzistence:\n\n* **Write quorum (Zápisové kvórum):** Platí zde pravidlo `W > N / 2`. Znamená to, že musím úspěšně a potvrzeně zapsat data do více než poloviny uzlů. Pokud se vyskytnou *conflicting writes* (více zápisů ve stejný čas), tak se to vyřeší tím, že jen jeden z nich zvládne reálně zapsat na většinu uzlů.\n* **Read quorum (Čtecí kvórum):** Platí pravidlo `R + W > N`. Toto číslo udává, z kolika uzlů musíme číst, abychom měli jistotu, že získáme ta nejnovější data a nenastane read-write problém."
+    },
+    {
+      "id": "019e3705-6aba-7278-b5f2-23b98948f7e6",
+      "type": "note",
+      "title": "7. Přednáška - Use cases Big Dat",
+      "content": "K čemu se v praxi Big Data využívají:\n\n* **Association rule learning:** Hledání vztahů mezi objekty (např. nákupní košík – co dalšího by si mohl zákazník koupit).\n* **Klasifikace objektů:** Rozřazování uživatelů (např. zákazníci rybáři, maminky) na základě jejich nákupů či jiných informací.\n* **Signal processing:** Zpracování signálů (např. jako dělá strejda od tety Soni).\n* **Crowdsourcing:** Získávání informací od velkého množství lidí (např. data ze hry, řešení CAPTCHA).\n* **Analýza časových řad:** Zkoumání dat, která se mění v čase.\n* **Analýza sentimentu:** Zkoumání nálady v textech (např. komentáře na Wall Street Bets)."
+    },
+    {
+      "id": "019e3705-6aba-7278-b5f2-2416d35d6e8f",
+      "type": "note",
+      "title": "7. Přednáška - Cloud computing (Modely a Vlastnosti)",
+      "content": "### Distribuční modely Cloudu\n* **SaaS (Software as a Service):** Software poskytovaný jako služba přímo pro koncové uživatele.\n* **PaaS (Platform as a Service):** Platforma pro vývojáře softwaru, sloužící k implementaci a deploymentu.\n* **IaaS (Infrastructure as a Service):** Poskytnutí infrastruktury (drahý hardware, který tak nemusím kupovat sám).\n\n### Vlastnosti, výhody a nevýhody\n* **Platby a Typy:** Platí se za čas užití, měsíčně nebo podle velikosti dat. Cloud může být privátní, veřejný nebo komunitní.\n* **Výhody:** Nemusím řešit údržbu a setup infrastruktury. Data mohou být snadno sdílena (ukazuje se, že dávat privátní data do cloudu není o tolik nebezpečnější než je mít lokálně, a může to být i lepší). Pro Big Data je to často levnější než budovat vlastní software, protože se můžeme zaměřit čistě na funkcionalitu.\n* **Nevýhody:** Vendor lock-in (je pak těžké přejít z jednoho řešení na distribuované u jiného poskytovatele) a potenciálně vysoké ceny."
+    },
+    {
+      "id": "019e3705-6abb-71df-9eca-1a7e25db96d1",
+      "type": "note",
+      "title": "7. Přednáška - Rozdělení databází",
+      "content": "Databáze pro zpracování dat můžeme podle jejich vzniku a účelu rozdělit takto:\n\n* **Core databáze:** Tyto databáze přímo vznikly pro potřeby Big Data. Patří sem modely: Key-value, Document, Column-family a Graph.\n* **Non-core databáze:** Nejsou primárně stavěné pro Big Data. Patří sem: Object a XML databáze.\n* **Nové Multi-model databáze:** Často nabízejí rozšířenou funkcionalitu spojením více přístupů. Řadíme sem také Array DB a NewSQL DB."
+    },
+    {
+      "id": "019e3708-7805-73dd-b802-2b574916eed1",
+      "type": "note",
+      "title": "7. Přednáška - Agregáty (Aggregates)",
+      "content": "**Co je to agregát?**\nAgregát je kolekce dat, ke které se chováme jako k jednotce (např. provádíme nad ní atomickou změnu). Přístup k agregátům se liší podle typu NoSQL databáze:\n\n* **Key-value stores:** Uloženo jako \"blob\" (neprůhledný blok) dat; databáze nedokáže koukat dovnitř na strukturu.\n* **Dokumentové databáze:** Zde je agregátem strukturovaný dokument. Díky tomu můžeme agregovat přímo podle obsahu a databáze datům \"rozumí\".\n* **Column-family databáze:** Základní jednotkou je sice sloupec, ale agregát může být tvořen buď sloupcem, nebo celým řádkem.\n* **Multi-model stores:** Tyto databáze podporují různé datové modely (včetně některých agregátových) a umožňují tzv. multi-model dotazy."
+    },
+    {
+      "id": "019e3708-7806-7798-b5a2-dedb37f58574",
+      "type": "note",
+      "title": "8. Přednáška - Key-value stores (Úvod a vlastnosti)",
+      "content": "Jedná se o nejjednodušší NoSQL databáze, které fungují jako jednoduchá hash table (tabulka klíč-hodnota). Používají se hlavně tehdy, když ke všem záznamům přistupujeme výhradně přes primární klíč.\n\n### Klíčové vlastnosti\n* **Operace:** Data můžeme načíst, změnit a mazat; systém je ideální pro rychlé *single put* a *single get* dotazy.\n* **Výkon:** Mají velmi dobrou performanci, protože od databáze nevyžadujeme téměř žádnou logiku – data se zpravidla zpracují až v samotné aplikaci.\n\n### Kdy je POUŽÍT (Use cases)\n* Ukládání informací o session (např. JSON objekt, kterému nechceme definovat pevné schéma, protože může mít různou strukturu).\n* Uživatelské profily a preference, u kterých potřebujeme velmi rychlé načtení.\n* Data nákupního košíku.\n\n### Kdy je NEPOUŽÍT\n* Jsou špatné, pokud mají mezi sebou data vztahy a my tyto vztahy potřebujeme využívat.\n* Nepodporují jednu transakci pro více klíčů.\n* Nevhodné, pokud se potřebujeme dotazovat na to, co se skrývá uvnitř hodnoty, nebo pokud potřebujeme dělat nějaké agregace dat.\n* Operace s množinou klíčů (např. hromadná změna všech klíčů) často chybí, i když postupně některé systémy tyto části přidaly."
+    },
+    {
+      "id": "019e3708-7806-7798-b5a2-e159eaf9ba40",
+      "type": "note",
+      "title": "8. Přednáška - Dotazování a správa klíčů (Key-value)",
+      "content": "Základní dotazování v těchto databázích probíhá výhradně **podle klíče**. Hromadné vypsání všech klíčů bývá drahé (výpočetně náročné), obzvlášť když hledaný klíč nevíme. Některé systémy však podporují oindexování dat, díky čemuž nad nimi lze dělat i full-text search.\n\n### Tvorba klíčů\n* Klíč tvoříme například podle unikátní identifikace uživatele (např. e-mail).\n* Hodnoty můžeme brát z timestampů (časových razítek) nebo je generovat nějakým algoritmem.\n* Tento koncept je velmi vhodný pro věci se snadným klíčem – session data, user profile nebo shopping cart data.\n\n### Expirace dat\nKlíče mohou po nějaké době expirovat (automaticky se smazat), což je funkcionalita vhodná například právě pro nákupní košíky."
+    },
+    {
+      "id": "019e370a-8ea9-7204-9d15-300983277388",
+      "type": "note",
+      "title": "8. Přednáška - Riak (Základy a HTTP/Java API)",
+      "content": "Riak má vestavěnou podporu MapReduce.\n\n### Správa klíčů a Buckets\n* **Buckets:** Klíče se ukládají do tzv. buckets, což je vlastně namespace pro klíče.\n* **Nastavení bucketu:** Pro bucket můžeme dělat různá nastavení. Například počet replik pomocí `n_val`, povolit concurrent updaty pomocí `allow_mult`, nebo definovat `r` a `rw` quorum a další.\n* **Struktura dat:** Data (např. pro uživatele) můžeme dát všechna pod jeden klíč, rozdělit je do bucketů podle typu, nebo udělat různé klíče pro různé části (např. za UserID bude něco dalšího).\n* Pokud dáme klíč do neexistujícího bucketu, automaticky se vytvoří. Klíče můžeme specifikovat ručně, nebo je Riak umí generovat sám.\n\n### Rozhraní (API)\n* **Java API:** Používá metody `getBucket(name)`, `bucket.store(key,value).execute()` a `bucket.fetch(key).execute()`. Obě posledně jmenované vracejí `IRiakObject`.\n* **HTTP API:** Defaultní interface je HTTP podporující CRUD operace. Základní cesty jsou ve formátu `/riak/<bucket>/<key>`.\n\n### cURL příklady\n* `curl http://db-adress/riak?buckets=true` vypíše všechny buckety (stejně tak `riak/foo?keys=true` pro klíče).\n* `curl -X PUT http://db-adress/riak/bucket -H \"Content-Type: json\" -d '{\"props\": {\"n_val\": 2}}'` upravuje nastavení replikace.\n* `curl -H \"Content-Type: plain/text\" -d \"My text\" /riak/foo` dělá POST request. Když v adrese nespecifikuji klíč (jen bucket, např. `/riak/foo`), vytvoří se automaticky.\n* `curl -i` říká, že se vypíšou i vracené headery (použitelné s `-X PUT/DELETE`, u PUT jako u POST, u DELETE bez obsahu)."
+    },
+    {
+      "id": "019e370a-8ea9-7204-9d15-346399e3a11f",
+      "type": "note",
+      "title": "8. Přednáška - Riak links (Vztahy)",
+      "content": "**Riak links** umožňují dělat vztahy mezi jednotlivými objekty. Díky nim můžeme v databázi vytvářet olabelovaný orientovaný graf a následně se na něj dotazovat.\n\n### Vytváření vztahů\n* Vztah definujeme přidáním další hlavičky za Content-Type.\n* Příklad: `-H 'Link: </riak/artists/Bruce>; riaktag=\"performer\"' -d \"The River\" http://db-adress/riak/albums/TheRiver`.\n\n### Dotazování na graf\n* Příklad dotazu: `http://db-adress/riak/albums/TheRiver/artists,performer,1`.\n* Vždy máme **3 parametry**:\n  1. Omezení na konkrétní bucket (zde `artists`).\n  2. Jakou chceme hranu (zde `performer`).\n  3. Zda chceme krok ve výsledku (pokud nechceme, dáme tam `0`, pokud ano, dáme `1`).\n* Místo tagu můžeme dát podtržítko `_`, pak jdeme přes cokoliv."
+    },
+    {
+      "id": "019e370a-8ea9-7204-9d15-38d5e1e40578",
+      "type": "note",
+      "title": "8. Přednáška - Riak Search",
+      "content": "**Riak Search** je distribuovaný full-text search engine s podporou pro různé typy dat, jako jsou JSON, XML a plain text.\n\n### Proces indexace\n1. Data se nejdříve oindexují – systém je přečte a rozdělí na fieldy (např. pole `title` v JSONu).\n2. V těchto fieldech se text rozdělí na jednotlivé termy.\n3. Následuje normalizace – nechceme indexovat slova jako \"and\" a termy chceme převést do základního tvaru.\n4. Výsledkem je struktura `{Field, Term, DocumentID}`, která se zapíše do indexu.\n\n### Možnosti vyhledávání\n* Můžeme používat wildcardy `*` a `?`.\n* Podporuje range dotazy (např. `[red TO rum]`).\n* Umožňuje používat operátory AND, OR, NOT, seskupování (grouping) a prefix matching.\n* Lze vyhledávat vzdálenosti v textu – například dotaz `\"See spot run\"~20` najde dokumenty, které mají tato slova obsažena v bloku 20 slov.\n\n### Základní příkazy\n* Vytvoření indexu: `index <index> <path>`.\n* Samotné vyhledávání: `search <index> <query>`."
+    },
+    {
+      "id": "019e370c-69ec-7239-9c45-e0244df118ba",
+      "type": "note",
+      "title": "8. Přednáška - Redis (Základní přehled)",
+      "content": "Redis je populární In-Memory Data Set. Pro větší datasety využívá distribuci.\n\n### Klíče, hodnoty a operace\n* **Klienty:** Má k dispozici klienty pro hodně jazyků, například PHP, Java a další.\n* **Klíče:** Klíč může být naprosto libovolná binární hodnota.\n* **Hodnoty:** Uložená hodnota může být objekt různých typů – string, hash, list, set nebo sorted set.\n* **Operace:** Redis umí nad hodnotami dělat operace jako range, diff, union, intersect atd..\n* **Ukládání na disk:** Přestože je to in-memory databáze, data se pravidelně ukládají na disk a příkazy se postupně přidávají do logu."
+    },
+    {
+      "id": "019e370c-69ec-7239-9c45-e43d3324b084",
+      "type": "note",
+      "title": "8. Přednáška - Redis (Pipelining, Pub/Sub a expirace klíčů)",
+      "content": "Redis nabízí pokročilé mechanismy pro zpracování příkazů a práci s klíči:\n\n* **Pipelining:** Můžu poslat více příkazů na server najednou a pak přečíst všechny odpovědi (replies) najednou, což zrychluje komunikaci.\n* **Publish/subscribe:** Můžeme se přihlásit ke kanálu, kam někdo zapisuje, nebo tam naopak něco poslat.\n\n### Time To Live (TTL)\nKlíč může mít nastaveno TimeToLive, a jakmile tento čas vyprší, klíč je smazán (deleted).\n* **Příklad:** Máme klíč `cookie:google` a hodnotu `hello`.\n* `SET cookie:google hello` uloží hodnotu ke klíči.\n* `EXPIRE cookie:google 30` nastaví expiraci na 30 sekund.\n* `TTL cookie:google` nám řekne, kolik sekund klíči ještě zbývá. Když už je expirovaný, vrací `-1` a následný dotaz `GET cookie:google` vrátí `nil`."
+    },
+    {
+      "id": "019e370d-6ded-7613-861e-0e21434aa3d5",
+      "type": "note",
+      "title": "8. Přednáška - Redis (Datový typ: String)",
+      "content": "String je v Redisu **binary safe**, což znamená, že do něj můžeme bezpečně uložit třeba i celý JPEG obrázek (Image).\n\n### Příkazy a operace\n* **Základní operace:** K dispozici máme příkazy `set`, `get` a `setnx` (tento provede uložení jen tehdy, když klíč ještě není nastavený/setnutý).\n* **Práce s textem:** Můžeme využít příkazy `append` a `strlen`, nebo získat či nastavit substring pomocí `GET` a `SETRANGE`.\n* **Číselné operace:** Pokud jsou ve stringu uložené integery (celá čísla), můžeme použít operace jako `incr`, `incrby` nebo `decr`.\n* **Bitové operace:** Redis pro tento typ podporuje i příkazy `getbit`, `setbit` a `bitcount`."
+    },
+    {
+      "id": "019e370d-6ded-7613-861e-12c0af661adc",
+      "type": "note",
+      "title": "8. Přednáška - Redis (Datový typ: List)",
+      "content": "List je v Redisu seznam stringů, který je setříděný (sortěný) přesně podle pořadí vkládání. Vnitřně se jedná o spojový seznam (spoják), což znamená, že má velmi rychlý přístup na okrajích, ale pomalejší uprostřed.\n\n### Vlastnosti a operace\n* **Kapacita a mazání:** List může obsahovat maximálně 2^32 - 1 elementů. Jakmile je list úplně prázdný, jeho klíč je automaticky odebrán.\n* **Přidávání prvků:** Prvky můžeme přidávat na začátek či na konec příkazy `LPUSH` a `RPUSH`. Lze použít i `LINSERT` (vloží před či za specifický element) nebo `LPUSHX` (provede push jen tehdy, když daný list už existuje).\n  * *Příklad:* `LPUSH animals dog`.\n* **Mazání prvků:** Mazání okrajů se dělá pomocí `LPOP` a `RPOP`. Specifickou hodnotu vymažeme příkazem `LREM`.\n* **Získání dat:** Pro získání a procházení hodnot slouží `LRANGE`, ke zjištění délky `LLEN` a prvek na konkrétním indexu získáme přes `LINDEX`."
+    },
+    {
+      "id": "019e370d-bd1a-771f-9123-fae21df55e2c",
+      "type": "note",
+      "title": "8. Přednáška - Redis (Datový typ: Set)",
+      "content": "Set je kolekce neopakujících se stringů. Má stejný maximální počet elementů jako List.\n\n### Operace a příkazy\n* **Základní operace (složitost O(1)):** Můžeme velmi rychle přidat, odebrat nebo checknout existenci prvku. K tomu slouží příkazy `SADD`, `SREMM` (obvykle se značí jako `SREM`), `SISMEMBER`.\n* **Množinové operace:** `SDIFF`, `SUNION` a další. Existují i varianty s příponou STORE (např. `SDIFFSTORE`), u kterých se výsledek rovnou někam uloží.\n* **Práce s prvky:** \n  * `SCARD` - vrátí počet prvků.\n  * `SMEMBER` - vrátí všechny elementy.\n  * `SPOP` - náhodně odebere element.\n  * `SRANDMEMBER` - vrátí náhodný element (bez odebrání).\n  * `SMOVE` - přesune element z jednoho setu do druhého.\n\n**Příklad použití:** `SADD friends:Lisa Anna Donna` (přidá Annu a Donnu jako přátele Lisy)."
+    },
+    {
+      "id": "019e370d-bd1a-771f-9123-fc21f71df971",
+      "type": "note",
+      "title": "8. Přednáška - Redis (Datový typ: Sorted set)",
+      "content": "Sorted set je kolekce neopakujících se stringů s definovaným pořadím. Složitost operací je zde O(log(n)).\n\n### Řazení prvků\n* Každý prvek má přidělené své **skóre**, podle kterého se řadí.\n* U prvků, které mají stejné skóre (stejné hodnoty), jsou tyto prvky seřazeny lexikograficky.\n\n### Příkazy\n* Základní práce: `ZADD`, `ZREM`, `ZINCRBY`, `ZCARD`, `ZRANGEBYSCORE`.\n* I u seřazených množin (sorted sets) lze provádět množinové operace, a to i ve variantách pro rovnou uložení (store).\n\n**Příklad použití:** `ZADD aricles 1 Anna 2 John 5 Tom`."
+    },
+    {
+      "id": "019e370d-bd1a-771f-9124-00d8578eee86",
+      "type": "note",
+      "title": "8. Přednáška - Redis (Datový typ: Hash)",
+      "content": "Hash v Redisu představuje množinu dvojic klíč-hodnota.\n\n### Základní příkazy\n* **Nastavení hodnot:** `HSET`, `HMSET`.\n* **Získání hodnot:** `HGET`, `HGETALL`.\n* **Hromadné získání:** Více hodnot najednou můžeme vytáhnout pomocí `HMGET`.\n* **Další operace:** \n  * `HKEYS` - získá klíče.\n  * `HVALS` - získá hodnoty.\n  * `HEXISTS` - ověří existenci.\n  * `HDEL` - provede smazání.\n\n**Příklad použití:** `HMGET users:sara login sara group students` (zde získáváme dvě dvojice, kde klíče představují `sara:login` a `group:students`)."
+    },
+    {
+      "id": "019e370e-d4c6-720e-b679-845593996eb0",
+      "type": "note",
+      "title": "8. Přednáška - Transakce v Riaku",
+      "content": "### Koncept BASE místo ACID\n* Místo tradičního ACID máme v Riaku model BASE (Basically Available, Soft state, Eventually consistent).\n* Systém využívá koncept tzv. **quorums**.\n* Tato quora mohou být nastavena pro každou operaci a řeknou nám, na kolik nodů musíme data zapsat nebo z kolika nodů je číst.\n* Parametry zahrnují například `dw` (durable write) nebo `rw` pro operaci delete.\n* Tato nastavení neurčují jen to, že operace začala, ale přímo na kolika nodech musí reálně a potvrzeně \"dopadnout\" (skončit úspěchem)."
+    },
+    {
+      "id": "019e370e-d4c6-720e-b679-893bdb5843a3",
+      "type": "note",
+      "title": "8. Přednáška - Riak Clustering (Ring a Uzly)",
+      "content": "V Riaku není žádný master node; používá se zde **konzistentní hashování na kruh**. \n* Nemusíme přesouvat klíče, když do hash-table přidáváme nebo z ní ubíráme sloty.\n* Každý node v clusteru má na starosti konkrétní kus kruhu. \n* Když stroj vypadne, stačí přehashovat jen tu část klíčů, které tento konkrétní uzel měl.\n\n### Riak Ring a Virtuální Nody\n* **Riak ring** je 160bitový integer space, který je rozdělený na stejně velké partitions.\n* Fyzické nody (Physical nodes) na sobě spouštějí virtuální nody (Virtual nodes).\n* Každý virtuální node má na starosti část kruhu.\n* Systém je vymyšlený tak, aby se virtuální nody na kruhu střídaly v tom, na jakém fyzickém nodu právě běží.\n* Tím pádem nemá žádný fyzický node jednu souvislou dlouhou část kruhu, ale spravuje malé části rozmístěné okolo celého kruhu.\n* Děláme to proto, že po zahashování hodnoty se data umístí na *N* virtuálních nodů v pořadí od toho, na kterého vyšel hash. Díky tomuto rozložení máme 1 kopii na každém fyzickém nodu (pokud N není moc velké).\n* Každý uzel s tímto algoritmem počítá a přesně ví, kde má hledat repliky.\n\n### Výpadek (Hinted Handoff)\n* Když vypadne node, dojde k události zvané **hinted handoff**.\n* Práci poškozeného uzlu dočasně přeberou vedlejší virtuální nody, což logicky znamená jiné fyzické nody."
+    },
+    {
+      "id": "019e370e-d4c6-720e-b679-8e1b7fb50733",
+      "type": "note",
+      "title": "8. Přednáška - Riak Clustering (Gossip protokol a Koordinátor)",
+      "content": "### Gossip Protokol\n* Informace o tom, kdo v clusteru funguje a kdo ne, se sdílí pomocí **Gossip protocolu**.\n* Tímto způsobem se napříč celým clusterem šíří informace o stavu ringu a nastavení bucketů (bucket properties).\n* Během provádění gossipu uzel předá to, \"co si myslí\" (svá data o stavu sítě), náhodně zvolenému nodu.\n* Tento proces se spouští pokaždé, když se změní to, co uzel o clusteru ví, nebo když se s nějakým uzlem nedokáže spojit.\n* Zároveň se spouští i pravidelně, aby si uzel ověřil, že nezmeškal žádný důležitý update.\n\n### Coordinovací Vnode\n* Každý uzel se může stát koordinovacím vnodem.\n* Koordinátor najde vnode, kde má být konkrétní klíč uložen, a dalších N-1 nodů, na kterých sídlí jeho repliky.\n* Pošle jim všem dotaz a čeká, dokud se mu nevrátí dostatek odpovědí (například podle definovaného quora). Následně vrátí finální výsledek uživateli."
+    },
+    {
+      "id": "019e370e-d4c6-720e-b679-91ae2652dcdf",
+      "type": "note",
+      "title": "8. Přednáška - Riak Clustering (Vector clocks a Sourozenci)",
+      "content": "### Vector Clock\n* U všech uložených hodnot v databázi se udržuje tzv. **vector clock**.\n* Tyto vektorové hodiny umožňují částečné uspořádání událostí.\n* Můžeme z nich zjistit, kdy přesně události nastaly, jaká z hodnot je novější, nebo jestli jsou data vzájemně neporovnatelná.\n\n### Sourozenci (Siblings)\n* V nastavení bucketu můžeme povolit vznik tzv. sourozenců parametrem `allow_mult = true`.\n* Pokud dojde ke dvěma zápisům na stejné místo najednou, uloží se obě tyto možnosti. Může k tomu dojít i tehdy, pokud se někomu zasekly vektorové hodiny, nebo pokud je rovnou vůbec nezapsal.\n* Při následném čtení dat (get) si můžeme vypsat všechny sourozence s jejich ID (v-tagy).\n* Následně můžeme z aplikační logiky vyřešit, jak se má vybrat nebo sloučit nová hodnota.\n* Pokud toto chování povolené nemáme, řeší situaci celý Riak automaticky sám za pomoci v-clocků a klasických timestampů.\n\n### Komerční rozšíření\n* Komerční verze Riaku nabízejí multidatacenter podporu, lepší synchronizaci, a pokročilý monitoring a statistiky."
+    },
+    {
+      "id": "019e3710-a1d2-7097-a90d-b5f495a30af3",
+      "type": "note",
+      "title": "8. Přednáška - Redis (Transakce)",
+      "content": "### Atomicitia a fronta příkazů\n* Každý jednotlivý příkaz (command) v Redisu je atomický.\n* Můžeme vytvářet transakce i pro více příkazů. \n* Proces funguje tak, že nejdříve dáváme příkazy do fronty – tu začneme příkazem `MULTI` a následně provádění spustíme pomocí `EXEC`.\n* Výhodou `MULTI` je, že můžeme kdykoliv zavolat `DISCARD`, a tím celou frontu zrušit.\n\n### Chybové stavy a Rollback\n* **Před EXEC:** Transakce může selhat ještě před zavoláním `EXEC` (např. kvůli syntaktické chybě nebo *out of memory*). Pokud příkaz v pořádku projde do fronty, dostaneme odpověď `QUEUED`.\n* **Po EXEC:** Pokud transakce spadne až po zavolání `EXEC` (například použitím příkazu na špatný klíč), platí, že pokud jeden příkaz selže, ostatní příkazy ve frontě se i tak provedou.\n* **Není zde žádný rollback**, a to záměrně, aby se systém zbytečně nezpomaloval."
+    },
+    {
+      "id": "019e3710-a1d2-7097-a90d-b8a099578429",
+      "type": "note",
+      "title": "8. Přednáška - Redis (Replikace)",
+      "content": "### Master-slave architektura\n* Využívá se Master-slave replikace, přičemž platí, že jeden uzel může být zároveň masterem i slavem.\n* Replikace je **neblokující na straně mastera**.\n* Replikace je **téměř neblokující i na straně slava** – když slave dělá replikaci, dál vrací klientům stará data, a až ke konci se na krátký okamžik zablokuje a přepíše celá svá data připravenými novými daty.\n\n### Připojení a resynchronizace\n* Když se slave znovu připojí k masterovi, pošle mu příkaz `SYNC`.\n* Master mu následně na pozadí vytvoří kopii a mezitím si zapisuje nové příkazy, které ji modifikují. Když to má hotové, pošle stav i příkazy slavovi, který si to uloží nejprve na disk a pak do paměti.\n* **Partial re-synchronization:** Nově se nemusí dělat plná resynchronizace. Master si drží in-memory backlog toho, co bylo a nebylo na daném slavovi zreplikováno. Po znovupřipojení se mohou dohodnout, že budou v replikaci pokračovat přímo z místa, kde přestali."
+    },
+    {
+      "id": "019e3710-d2e0-718a-91e2-10a0b85bbe17",
+      "type": "note",
+      "title": "8. Přednáška - Redis (Sharding a Sentinel)",
+      "content": "### Sharding (Rozdistribuování dat)\n* Redis používá systém **16 384 slotů**, kde každý klíč spadne do jednoho konkrétního slotu.\n* Každý uzel (node) má na starosti určitou část těchto hash slotů (jsou rozděleny prostě postupně od 0 do 16 383).\n* Když se do clusteru nějaký node přidá nebo z něj odpadne, uzly si tyto sloty jednoduše mezi sebou předají.\n\n### Redis Sentinel\n* Je to systém určený pro management (managování) Redis instancí.\n* Lze ho různě nastavovat, například po jak dlouhé době se hlásí fail a co přesně se má monitorovat.\n* **Funkce:** Zajišťuje monitoring a notifikace, když se něco rozbilo.\n* **Automatic failover:** Pokud master nefunguje, jak by měl, Sentinel automaticky promotne (povýší) slava na nového mastera.\n* Zároveň rekonfiguruje ostatní slavy na tohoto nového mastera a aplikacím, které server používají, sdělí novou adresu."
+    },
+    {
+      "id": "019e3711-b818-718b-b5c7-e0f129c87735",
+      "type": "note",
+      "title": "9. Přednáška - Column-family databases (Základní pojmy)",
+      "content": "Tyto databáze mají mnoho sloupců a každý má tzv. **row key**. Relační terminologii odpovídají následovně: databázi se říká database a databázová instance je cluster.\n\n### Způsob ukládání\n* **Column-oriented:** Znamená to ukládání po sloupcích (je to podobné indexu). Díky tomu máme snazší a rychlejší queries (dotazy) přes sloupce, ale naopak pomalejší dotazy přes celé řádky.\n* Systému je nicméně dobré napovědět (definovat) strukturu, aby mohl dělat pod kapotou různé optimalizace.\n\n### Architektura a jednotky\n* **Column (sloupec):** Je to základní jednotka. Jméno slouží jako klíč a jde o name-value pair uložený společně s timestampem (časovým razítkem), který se hodí na expiraci dat nebo řešení konfliktů.\n* **Row (řádek):** Je to kolekce columns spojených s jedním klíčem. Může mít sloupce libovolně, neexistuje zde striktní schéma. Různé řádky tedy nemusí mít stejné sloupce.\n* **Column-family:** Je to kolekce stejných řádků (něco jako tabulka). Jsou to data, na která typicky často přistupujeme najednou (např. chceme pro uživatele načíst rovnou všechny informace z profilu)."
+    },
+    {
+      "id": "019e3711-b818-718b-b5c7-e764c3937c28",
+      "type": "note",
+      "title": "9. Přednáška - Column-family databases (Use cases)",
+      "content": "### Kdy POUŽÍT (Use cases)\n* **Event logging:** Můžeme sem pohodlně ukládat libovolné datové struktury.\n* **Ukládání event information:** Hodí se pro CMS nebo Blogging Platforms. Například na blogu většinou nechci nijak složitě vyhledávat a můžu tam chtít ukládat různé informace.\n\n### Kdy NEPOUŽÍVAT\n* Když nutně potřebujeme transakční ACID vlastnosti.\n* Když potřebujeme dělat agregace jako SUM či AVG.\n* Když máme raný prototyp a dotazy, které potřebujeme na databázi pokládat, se ještě velmi často mění – na to se tato pevnější struktura nemusí hodit."
+    },
+    {
+      "id": "019e3711-b818-718b-b5c7-ea117b114c21",
+      "type": "note",
+      "title": "9. Přednáška - Apache Cassandra (Úvod a vlastnosti)",
+      "content": "Cassandra umí kooperovat s Hadoopem, má podporu pro MapReduce a používá svůj vlastní dotazovací jazyk CQL.\n\n### Datová struktura\n* Máme **cluster**, který má více **keyspace**, a ten obsahuje **column family** (neboli tabulky).\n* Základem je opět **column**, které jsou uložené v **row** (řádku s klíčem). Column se skládá z name-value páru a timestampu.\n* Jména sloupců lze vlastně používat i jako array (pole) hodnot – nemusíme k nim mít nutně přiřazenou žádnou hodnotu.\n* Řádky (rows) v column family nemusí být stejné. Strukturu nemusíme striktně definovat, ale můžeme definovat například nějaká povinná pole.\n\n### Dotazování\n* **Joiny:** Většinou nemají podporu. Jediná možnost je, že si dotaz (výsledek) předpočítáme, což ale trvá dlouho.\n* **Indexy:** Můžeme mít tzv. sekundární indexy (vyhledávání podle něčeho jiného než hlavního ID)."
+    },
+    {
+      "id": "019e3712-cfad-7468-9129-b2ce2c5fcd56",
+      "type": "note",
+      "title": "9. Přednáška - Cassandra (Struktura a typy sloupců)",
+      "content": "### Struktura sloupce (Column)\n* Sloupec se skládá z: **name + value + timestamp**.\n* Primárním indexem je **row key**, ale sloupce mohou být indexovány podle jména pomocí **sekundárního indexu**.\n\n### Typy sloupců\n* **Expiring:** Sloupec s volitelným datem expirace, kterému se říká TTL (Time To Live).\n* **Counter:** Zajišťuje se u něj konzistence napříč replikami, abychom mohli spolehlivě počítat nějaké eventy či procesy.\n* **Super:** Přidává nadúroveň – supersloupec může obsahovat různé sloupce, což nám umožňuje sloupce groupovat (seskupovat)."
+    },
+    {
+      "id": "019e3712-cfad-7468-9129-b4a03b745e87",
+      "type": "note",
+      "title": "9. Přednáška - Cassandra (Column-family)",
+      "content": "### Definice a schémata\n* Column-family může definovat **metadata o sloupcích**. Pokud budeme chtít použít sloupec, musí mít daný datový typ. O tom, co se ale reálně uloží, rozhoduje klientská aplikace.\n* **Static:** Je to podobné jako tabulka relační databáze. Řádky mají stejné sloupce, ale nemusí mít všechny definované.\n* **Dynamic:** Můžeme tam definovat cokoliv. Často se využívá pro předpočtené výsledky nějakého dotazu (například \"všichni kamarádi někoho\") a můžeme využívat jen klíče (keys).\n\n### Datové typy\n* **Comparator:** Je datový typ pro *názvy* sloupců (funguje jakoby datový typ array).\n* **Validator:** Je datový typ pro *hodnoty* sloupců, nebo pro rowid."
+    },
+    {
+      "id": "019e3712-cfad-7468-9129-b9fa90e093a7",
+      "type": "note",
+      "title": "9. Přednáška - Cassandra (CQL a práce s daty)",
+      "content": "Column-families se postupem času přejmenovaly na tabulky a přišlo se s novým způsobem definice. Jazyk **CQL** sice nemá joiny ani poddotazy, ale je velmi podobný SQL.\n\n### Keyspace a Tabulky\n* **Vytvoření Keyspace:** `CREATE KEYSPACE Test WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 3}`. Existuje také `NetworkTopologyStrategy`, která má replikační faktor definovaný pro datacentrum.\n* **Použití:** `USE Test;` – začnu ho používat a můžu začít dělat tabulky.\n* **Vytvoření tabulky:** `CREATE TABLE timeline (userid uuid, ...., PRIMARY KEY (userid, posted_month, posted_time))`. Klíč zde určuje, jakým způsobem se data budou distribuovat.\n\n### Typy klíčů\n* **Partition key:** Je to první část klíče. Recordy se stejným partition key budou uloženy na stejném nodu.\n* **Clustering columns:** Určují pořadí pro fyzické uložení řádků v partition.\n\n### Zápis a TTL (Time To Live)\n* Data lze vložit s časovačem: `INSERT INTO excelsior.clicks (userid, url, date, name) VALUES (....) USING TTL 86400;`.\n* Následně se na zbývající čas můžeme dotázat: `SELECT TTL (name) from ...;`."
+    },
+    {
+      "id": "019e3717-a32a-77eb-848f-d50effb9fffe",
+      "type": "note",
+      "title": "9. Přednáška - Cassandra (Kolekce - Set, List, Map)",
+      "content": "Cassandra podporuje několik typů kolekcí pro ukládání více hodnot do jednoho pole:\n\n* **Set:** Množina unikátních hodnot vrácených v abecedním pořadí. Lze s nimi dělat množinové operace (např. sjednocení). Příklad: `CREATE TABLE foo (emails set<text>);`, vložení: `INSERT INTO foo (emails) VALUES ({'value1', 'value2'})`.\n* **List:** Uspořádaný seznam prvků podle indexu. Může obsahovat stejnou hodnotu vícekrát. Vkládá se do hranatých závorek `['value1', 'value2']`. K prvkům lze přistupovat přes index: `UPDATE users SET top_places[2] = 'value'`.\n* **Map:** Dvojice name (klíč) + value. Každá dvojice je vnitřně reprezentována jako jeden sloupec (column) a každý prvek může mít vlastní TTL. Zápis: `UPDATE users SET todo = { '2020': 'enter mordor', ... }`."
+    },
+    {
+      "id": "019e3717-a32a-77eb-848f-d9289fc02b68",
+      "type": "note",
+      "title": "9. Přednáška - Cassandra (Dotazování, ORDER BY a ALLOW FILTERING)",
+      "content": "Dotazování (Queries) má v Cassandře svá specifika a omezení:\n\n* **Základní podmínky:** Máme k dispozici jen jednoduché podmínky. Klauzule `ORDER BY` a `GROUP BY` fungují **pouze přes primary key sloupce**. Pokud uděláme `GROUP BY` přes jiný než primární sloupec, vrátí se pouze první hodnota.\n* **Nefiltrující vs. filtrující dotazy:**\n  * *Nefiltrující:* Téměř všechny načítané záznamy jdou do výsledku. Systém dokáže odhadnout, jak dlouho to potrvá.\n  * *Filtrující:* Nevíme, jak dlouho budou trvat. Vznikají, když filtrujeme (`WHERE`) přes neindexovanou hodnotu. Systém v takovém případě hodí varování a operaci zablokuje.\n* **ALLOW FILTERING:** Pokud chceme filtrující dotaz přesto provést, musíme na konec dotazu přidat klauzuli `ALLOW FILTERING` (často se používá ve spojení s `LIMIT n`, aby se omezila zátěž)."
+    },
+    {
+      "id": "019e3717-a32a-77eb-848f-def7e4281a41",
+      "type": "note",
+      "title": "9. Přednáška - Cassandra (Zápis dat: Memtable a SSTables)",
+      "content": "Proces zápisu (Writes) a ukládání na disk funguje následovně:\n\n* **Zápis (Write):** Zápis je atomický vždy na úrovni jednoho řádku. Data se nejprve uloží do paměti do struktury zvané **Memtable**. Zároveň je zápis přidán do **commit logu** na disk (pro ochranu dat před pádem).\n* **SSTables (Sorted String Table):** Když Memtable překročí nastavenou velikost, zapíše se na disk jako SSTable a commit log se pro ni zkrátí. Čím víc tabulku používáme, tím větší by Memtable měla být.\n* **Vlastnosti:** Každá tabulka má vlastní Memtable a vlastní SSTables. **SSTables jsou immutable** (zcela neměnné).\n* **Čtení modifikovaných dat:** Protože nelze přepisovat na disku, upravený řádek se musí složit načtením z Memtable a případně několika různých SSTable souborů a zkombinovat se.\n* **Indexace:** Každá SSTable má *partition index* (seznam primárních klíčů a pozic, kde záznamy začínají) a *partition summary* (standardně je pro rychlejší hledání zaindexován každý 128. klíč)."
+    },
+    {
+      "id": "019e3717-a32a-77eb-848f-e2c178ea42d7",
+      "type": "note",
+      "title": "9. Přednáška - Cassandra (Koordinace Write Requestu)",
+      "content": "Když klient pošle požadavek na zápis (Write request) do clusteru, probíhá to takto:\n\n1. **Coordinator:** Požadavek přijde na libovolný uzel v clusteru, který se tím automaticky stane koordinátorem (coordinatorem) dané operace.\n2. **Distribuce replikám:** Tento uzel rozešle write requests všem replikám, které mají daný řádek uložený.\n3. **Potvrzení úspěchu:** O tom, kdy je zápis považován za úspěšný, rozhoduje nastavený **Write Consistency Level**. Ten udává, kolik replik musí koordinátorovi oznámit úspěch (tedy potvrdit, že data bezpečně zapsaly do své Memtable a do commit logu).\n4. Až se sejde dostatek potvrzení, koordinátor ohlásí úspěch zpět klientovi."
+    },
+    {
+      "id": "019e3719-1b3c-7323-b6d4-5456aa6585ca",
+      "type": "note",
+      "title": "9. Přednáška - Cassandra (Čtení dat a Read Repair)",
+      "content": "Při čtení dat (Reads) rozlišujeme v Cassandře dva druhy operací: **direct read request** a **background read repair request**.\n\n* **Direct read request:** Tento požadavek je limitovaný nastaveným *read consistency level*. Koordinátor pošle požadavek na čtení takovému počtu replik, jaký je právě vyžadován (např. quorum). Vybírá přitom ty repliky, které momentálně odpovídají nejrychleji. Získaná data se následně porovnají a použijí se ta úplně nejnovější (podle timestampu).\n* **Read repair:** Během tohoto procesu koordinátor kontaktuje a porovná data ze **všech** replik, které daný řádek obsahují. Pokud zjistí, že jsou některé repliky pozadu (mají starší verzi dat), zapíše na ně automaticky nové hodnoty. Celý proces *read repair* probíhá výhradně na pozadí."
+    },
+    {
+      "id": "019e3719-1b3c-7323-b6d4-58ccc2b4b54a",
+      "type": "note",
+      "title": "9. Přednáška - Cassandra (Updaty a Upserty)",
+      "content": "Úprava dat (Updates) funguje v Cassandře naprosto stejně jako vkládání (Insert):\n\n* **Zápis:** Řádky v diskových SSTables se nikdy nepřepisují. Změna se provede pouze jako nový zápis do paměťové Memtable.\n* **Upsert:** Systém dělá přirozeně tzv. *upsert*, což znamená, že se provede insert nebo update čistě na základě toho, jestli už data v systému existují.\n* **Timestamp:** Sloupce jsou přepsány (za platné jsou brány nové hodnoty) pouze v případě, že je nový timestamp vyšší než stávající. Timestamp generuje a posílá klient, a proto by měli být všichni klienti časově synchronizovaní.\n* **Slučování dat:** Pokud nejsou data hned přepsána v paměti, updaty se po čase uloží do nové SSTable. Staré a nové verze v různých SSTables se pak v pozadí periodicky spojují (mergují) pomocí **compaction process**."
+    },
+    {
+      "id": "019e3719-1b3c-7323-b6d4-5f6632f3ce9a",
+      "type": "note",
+      "title": "9. Přednáška - Cassandra (Mazání dat a Tombstones)",
+      "content": "Kvůli neměnnosti SSTables se v Cassandře data nemažou ihned (Deletes):\n\n* **Tombstone:** Místo fyzického smazání se v řádce vytvoří tzv. *tombstone*. Jde o speciální značku (marker), která indikuje, že data byla smazána. Tombstone zároveň říká systému, že má tuto informaci o smazání později poslat replikám, které v době požadavku nebyly dostupné.\n* **Grace period:** Sloupce s tombstonem existují v databázi po předem konfigurovatelnou dobu, které se říká *grace period* (ta je definovaná přímo pro tabulku).\n* **Fyzické smazání:** Jakmile tato doba dojde, zasáhne *compaction process* (který merguje SSTably) a sloupec definitivně smaže.\n* **Node repair:** Pokud je některý uzel (node) nedostupný příliš dlouho a propásne grace period, smazaná data na něm zůstanou, a když se znovu připojí, mohou se smazané záznamy znovu objevit (tzv. zombie data). Administrátoři proto musí občas spustit **node repair**, který všechny repliky synchronizuje a opraví."
+    },
+    {
+      "id": "019e371a-25ed-7628-ba24-0fd6bcf20c5f",
+      "type": "note",
+      "title": "9. Přednáška - Cassandra (Základní principy Compaction procesu)",
+      "content": "Compaction process slouží k údržbě a slučování dat na disku:\n\n* **Slučování dat:** Probíhá zmergování existujících SSTabulek podle *partition key*. Vyberou se vždy data s nejpozdějším timestampem (z toho důvodu musejí být klienti časově synchronizovaní). Jelikož jsou SSTabulky již sesortované, systém nepotřebuje náhodný přístup.\n* **Čištění:** V této fázi se definitivně smažou *tombstony* a všechna s nimi spojená smazaná data.\n* **Konsolidace:** Data z vícero SSTabulek se konsolidují do jednoho nového souboru a staré SSTabulky se následně vymažou.\n* **Spouštění:** Lze si detailně nastavit, kdy se má proces pro každou tabulku dělat. Často se spouští automaticky ve chvíli, kdy počet SSTabulek pro danou column-family překročí nastavený `min_threshold`."
+    },
+    {
+      "id": "019e371a-25ed-7628-ba24-122727c26cb3",
+      "type": "note",
+      "title": "9. Přednáška - Cassandra (Strategie Compaction procesu)",
+      "content": "Při slučování SSTabulek lze využít různé strategie podle typu zátěže:\n\n* **SizeTieredCompactionStrategy (defaultní):** Vytváří SSTables stejné velikosti. Tato strategie je nejvhodnější pro *write intensive workload*.\n* **DataTieredCompactionStrategy:** Ukládá data spadající do určité časové periody do jedné SSTable. Hodí se primárně pro *expiring data* a *time-series* (časové řady).\n* **LeveledCompactionStrategy (komplexní):** Fixní 5MB SSTables jsou uloženy do jednotlivých levelů, přičemž se v rámci jednoho levelu nikdy nepřekrývají. Když se daný level zaplní, vytvoří se nový, který je 10x větší. Je ideální pro *read-intensive workloads* – za předpokladu uniformních velikostí řádků pokryje 90 % čtení pouze jedna SSTable. V nejhorším možném případě se ale musí číst ze všech levelů."
+    },
+    {
+      "id": "019e371a-8357-7327-8962-68aee6141437",
+      "type": "note",
+      "title": "9. Přednáška - Cassandra (Architektura, Kruh a Gossip protokol)",
+      "content": "Cassandra využívá distribuovanou architekturu a specifické mechanismy pro zjišťování stavu sítě:\n\n* **Peer-to-peer architektura:** Neexistuje zde žádný master. Každý uzel (node) může fungovat jako koordinátor a systém přirozeně počítá s výpadky uzlů.\n* **Konzistentní hashování a Ring:** Cassandra cluster (který ukládá data partitions) využívá kruh, na který se ukazuje konzistentním hashováním. Kruh je rozdělen na tzv. **virtuální nody**. \n* **Fyzické uzly:** Ty si berou určité části virtuálních nodů. Díky tomu má každý fyzický uzel větší počet menších *partition ranges*. Když pak nějaký uzel vypadne, data se mnohem snáze a rovnoměrněji přenesou jinam.\n* **Gossip process:** Spouští se každou vteřinu. Uzel si vymění zprávy až s třemi dalšími uzly na clusteru (pošle informace o sobě a co si myslí o ostatních). Zprávy mají své verze, aby se daly poznat zastaralé informace, a celý mechanismus slouží k detekci chyb v síti."
+    },
+    {
+      "id": "019e371a-8357-7327-8962-6caf01de3bbb",
+      "type": "note",
+      "title": "9. Přednáška - Cassandra (Rozdělování dat a Replikace)",
+      "content": "Systém musí chytře rozhodovat, kam uloží primární data a kam jejich kopie:\n\n* **Partitioner:** Rozhoduje, jak se budou data distribuovat po uzlech a jaké vybrat repliky. Hash se počítá z *row key*.\n  * *Murmur3Partitioner:* Současný defaultní partitioner.\n  * *ByteOrderPartitioner:* Seřadí řádky lexikograficky podle klíčů (hash je v podstatě bytová reprezentace začátku klíče). To sice umožňuje snadné skenování dle primárního klíče, ale má to velký problém s load balancingem.\n* **Replikace:** Všechny repliky jsou stejně důležité. Pokud replikační faktor překročí počet dostupných nodů, jsou zápisy (writy) ignorovány, avšak čtení dál funguje (pokud je splněn read consistency level).\n* **Replica placement strategy:**\n  * *SimpleStrategy:* Dá první repliku na uzel vybraný partitionerem, další repliky umisťuje po směru hodinových ručiček (clockwise) na ringu. Vhodné pro jedno datacentrum.\n  * *NetworkTopologyStrategy:* Pokud máme uzlů víc a jsou rozdělené do Racků (blízké uzly), tato strategie umístí první repliku dle partitioneru a další na úplně jiné racky (protože často vypadne celý rack naráz). Většinou se používají 2-3 repliky na jedno datacentrum (každé DC může mít vlastní nastavení)."
+    },
+    {
+      "id": "019e371a-8357-7327-8962-7041ef31459d",
+      "type": "note",
+      "title": "9. Přednáška - Cassandra (Sledování topologie sítě - Snitch)",
+      "content": "**Snitch** je klíčová komponenta, která určuje topologii sítě a říká systému, do jakých datacenter se má zapisovat a odkud číst. Všechny nody v clusteru musí mít nastavenou naprosto stejnou konfiguraci Snitche.\n\n* **Typy Snitche:**\n  * *SimpleSnitch:* Topologii sítě vůbec neřeší.\n  * *RackInferringSnitch:* Topologii a umístění do racků odvodí z IP adres uzlů.\n  * *PropertyFileSnitch:* Topologie je exaktně popsaná v konfiguračním souboru.\n* **Dynamic snitching:** Jedná se o chytrý mechanismus, který neustále monitoruje historii a na základě efektivity reakce jednotlivých uzlů operativně rozhoduje, kam přesně se dotaz pošle nebo kam se data uloží."
+    }
+  ]
+}
