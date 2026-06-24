@@ -27,7 +27,7 @@
       "id": "019e36e3-29a8-77e5-97d0-63b0df93cbe4",
       "type": "note",
       "title": "1. Přednáška - Historie (Úrovně abstrakce)",
-      "content": "**Test Logic Layer vs. Physical Layer**\n\n* **Logic Layer:** Zde se rozlišují datové struktury pro uložení dat a tedy obecný typ databáze, jako je například relační, grafová nebo XML databáze. Nejedná se o konkrétní databázi, to spadá až do fyzické vrstvy.\n* **Physical Layer:** Na této vrstvě se rozlišuje, jak přesně je databáze naimplementovaná a jaké tam budou indexy."
+      "content": "**Logic Layer vs. Physical Layer**\n\n* **Logic Layer:** Zde se rozlišují datové struktury pro uložení dat a tedy obecný typ databáze, jako je například relační, grafová nebo XML databáze. Nejedná se o konkrétní databázi, to spadá až do fyzické vrstvy.\n* **Physical Layer:** Na této vrstvě se rozlišuje, jak přesně je databáze naimplementovaná a jaké tam budou indexy."
     },
     {
       "id": "019e36e3-29a8-77e5-97d0-6604f70667b3",
